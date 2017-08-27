@@ -73,7 +73,7 @@ Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 +
     'convert possible range to array
     Coefficients = Coefficients
     
-    If Not ExtractVector(arrCoeffs, Coefficients) Then GoTo errHandler
+    If Not ExtractVector(Coefficients, arrCoeffs) Then GoTo errHandler
     
     'if 'NA' is present and its value is 'TRUE' then remove all trailing 'NAs' lines
     If Not IsMissing(NA) Then
@@ -263,16 +263,16 @@ Private Function MasterPolynomReg( _
     
     'if 'IgnoreNA' is 'False' copy 'x' to 'xWithoutNAs' and 'y' to 'yWithoutNAs'
     If IgnoreNAs = False Then
-        If Not ExtractVector(xWithoutNAs, x) Then GoTo errHandler
-        If Not ExtractVector(yWithoutNAs, y) Then GoTo errHandler
+        If Not ExtractVector(x, xWithoutNAs) Then GoTo errHandler
+        If Not ExtractVector(y, yWithoutNAs) Then GoTo errHandler
     Else
         'else copy 'x' to 'xAsVector' and 'y' to 'yAsVector'
-        If Not ExtractVector(xAsVector, x) Then GoTo errHandler
-        If Not ExtractVector(yAsVector, y) Then GoTo errHandler
+        If Not ExtractVector(x, xAsVector) Then GoTo errHandler
+        If Not ExtractVector(y, yAsVector) Then GoTo errHandler
         
         If Not CopyOnlyNonNALines( _
-                xWithoutNAs, yWithoutNAs, _
                 xAsVector, yAsVector, _
+                xWithoutNAs, yWithoutNAs, _
                 PolynomialDegree _
         ) Then GoTo errHandler
     End If
@@ -377,8 +377,8 @@ End Sub
 'function to make vectors of the ranges/arrays and optionally only transfer
 'non-NA values
 Private Function ExtractVector( _
-    DestVector As Variant, _
-    Source As Variant _
+    Source As Variant, _
+    DestVector As Variant _
         ) As Boolean
     
     Dim N As Integer
@@ -409,10 +409,10 @@ End Function
 
 
 Private Function CopyOnlyNonNALines( _
-    ByRef xDest As Variant, _
-    ByRef yDest As Variant, _
     ByRef xSource As Variant, _
     ByRef ySource As Variant, _
+    ByRef xDest As Variant, _
+    ByRef yDest As Variant, _
     ByVal PolynomialDegree As Integer _
         ) As Boolean
     
