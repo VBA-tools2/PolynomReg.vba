@@ -399,7 +399,7 @@ Private Function ExtractVector( _
                 Exit Function
             End If
         Case 1
-            If Not CopyArray(DestVector, Source, True) Then Exit Function
+            If Not CopyArray(Source, DestVector, True) Then Exit Function
             N = UBound(DestVector) - LBound(DestVector) + 1
             If Not ChangeBoundsOfArray(DestVector, 1, N) Then Exit Function
         Case 0
