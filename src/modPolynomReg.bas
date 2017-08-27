@@ -2,6 +2,10 @@ Attribute VB_Name = "modPolynomReg"
 
 Option Explicit
 
+'module originally from Gerhard Krucker which was created 17.08.1995, 22.09.1996
+'and 2004 for VBA in EXCEL7. It was highly modified by Stefan Pinnow in 2016
+'and 2017.
+
 '==============================================================================
 'requires the 'modArraySupport' module from Chip Pearson available at
 '<http://www.cpearson.com/excel/VBAArrays.htm>
@@ -97,23 +101,16 @@ End Function
 
 
 '==============================================================================
-'Berechnen der Polynomkoeffizienten a0,...,an für eine polynomiale
-'Ausgleichsfunktion n-ten Grades für m Datenpunkte.
-'Parameter: x = Array mit x-Werten (Anzahl: m, beliebig)
-'           y = Array mit y-Werten (Anzahl: m, beliebig)
-'           n = Grad des zu erzeugenden Ausgleichspolynoms
-'
-'Das Resultat wird als Funktionswert (Arrayfunktion) retourniert
-'Autor: Gerhard Krucker
-'Datum: 17.08.1995, 22.09.1996
-'Sprache: VBA for EXCEL7
-'-----
-'Stefan Pinnow     20.12.2016
-'- revised "Parameterkontrolle"
-'- added optional parameter 'IgnoreNAs' so lines with 'NA' values are skipped
-'- added optional parameter 'VerticalOutput' which returns the polynomial
-'  coefficients vertically if this parameter is 'True'
-'
+'calculate the polynomial coefficients a0,...,an for the polynomial trend
+'function n-th degree for m data points using the method of least squares.
+'Parameter:
+'- x                = array of x values (number of points: m, any)
+'- y                = array of y values (number of points: m, any)
+'- PolynomialDegree = degree of to generate polynomial trend function
+'- VerticalOutput   = optional argument to allow a vertical output of the
+'                     polynomial coefficients
+'- IgnoreNAs        = optional argument to ignore "NA" data points
+'The result will be returned as array (vector)
 Function PolynomReg( _
     x As Variant, _
     y As Variant, _
@@ -156,24 +153,17 @@ errHandler:
 End Function
 
 
-'Berechnen der Polynomkoeffizienten a0,...,an für eine polynomiale
-'Ausgleichsfunktion n-ten Grades für m Datenpunkte
-'nach der Methode der kleinsten Summe der relativen Fehlerquadrate.
-'Parameter: x = Array mit x-Werten (Anzahl: m, beliebig)
-'           y = Array mit y-Werten (Anzahl: m, beliebig)
-'           n = Grad des zu erzeugenden Ausgleichspolynoms
-'
-'Das Resultat wird als Funktionswert (Arrayfunktion) retourniert
-'Autor: Gerhard Krucker
-'Datum: 17.08.1995, 22.09.1996, 24.09.2004
-'Sprache: VBA for EXCEL7, EXCEL XP
-'-----
-'Stefan Pinnow     20.12.2016
-'- revised "Parameterkontrolle"
-'- added optional parameter 'IgnoreNAs' so lines with 'NA' values are skipped
-'- added optional parameter 'VerticalOutput' which returns the polynomial
-'  coefficients vertically if this parameter is 'True'
-'
+'calculate the polynomial coefficients a0,...,an for the polynomial trend
+'function n-th degree for m data points using the method of least relative
+'squares.
+'Parameter:
+'- x                = array of x values (number of points: m, any)
+'- y                = array of y values (number of points: m, any)
+'- PolynomialDegree = degree of to generate polynomial trend function
+'- VerticalOutput   = optional argument to allow a vertical output of the
+'                     polynomial coefficients
+'- IgnoreNAs        = optional argument to ignore "NA" data points
+'The result will be returned as array (vector)
 Function PolynomRegRel( _
     x As Variant, _
     y As Variant, _
@@ -226,19 +216,19 @@ Private Function MasterPolynomReg( _
     UseRelativeVersion As Boolean _
         ) As Variant
     
-    'Anzahl x- und y-Werte
+    'amount of 'x' and 'y' values
     Dim CountX As Integer, CountY As Integer
-    'Anzahl auszugleichender Datenpunkte
+    'amount of (real) data points
     Dim m As Integer
-    'Dynamisches Array fuer die Summe der Potenzen von xk
+    'dynamic array for the sum of powers of 'xk'
     Dim Sxk() As Double
-    'Dynamisches Array fuer die Summe der Potenzen von xk * yk
+    'dynamic array for the sum of powers of 'xk*yk'
     Dim Sxkyk() As Double
-    'Dynamisches Array fuer die Koeffizientenmatrix G
+    'dynamic array for the coefficient matrix 'G'
     Dim G() As Double, G1 As Variant
-    'Dynamisches Array fuer den Konstantenvektor c
+    'dynamic array for the vector of coefficients 'c'
     Dim c() As Double
-    'Dynamisches Array fuer die Polynomkoeffizienten a0,...,an
+    'dynamic array for the polynomial coefficients a0,...,an
     Dim a() As Double
     'running variables
     Dim i As Integer, j As Integer
@@ -292,9 +282,9 @@ Private Function MasterPolynomReg( _
     'transfer (new) number of 'x' elements to 'm'
     m = UBound(xWithoutNAs) - LBound(xWithoutNAs) + 1
     
-    'Summe der Potenzen xk und xk*yk berechnen und in den entsprechende Arrays abspeichern
-    ReDim Sxk(PolynomialDegree * 2)     'Arrays auf passende Größe dimensionieren
-    ReDim Sxkyk(PolynomialDegree)       'Die Arrayindizes laufen von 0...PolynomialDegree, resp 0...2*PolynomialDegree
+    'calculate sum of powers 'xk' and 'xk*yk' and store them in corresponding arrays
+    ReDim Sxk(PolynomialDegree * 2)
+    ReDim Sxkyk(PolynomialDegree)
     Call Calculate_Sxk( _
             Sxk, xWithoutNAs, yWithoutNAs, _
             PolynomialDegree, m, UseRelativeVersion _
@@ -306,13 +296,16 @@ Private Function MasterPolynomReg( _
         Next
     Next
     
-    'Koeffizientenmatrix G und Konstantenvektor c erzeugen
-    ReDim G(1 To PolynomialDegree + 1, 1 To PolynomialDegree + 1)       'Matrix mit Indizes 0,...,PolynomialDegree;0,...,PolynomialDegree dimensionieren
-    ReDim G1(1 To PolynomialDegree + 1, 1 To PolynomialDegree + 1)      'Matrix für die Inverse von G (MINV kann nicht in G zurückschreiben)
+    '''produce coefficient matrix 'G' and vector of constants 'c'
+    'dimension matrix with indices 0,...,PolynomialDegree;0,...,PolynomialDegree
+    ReDim G(1 To PolynomialDegree + 1, 1 To PolynomialDegree + 1)
+    'matrix for the inverse of 'G' (MINVERSE can't write back to 'G')
+    ReDim G1(1 To PolynomialDegree + 1, 1 To PolynomialDegree + 1)
     ReDim c(1 To PolynomialDegree + 1)
-    ReDim a(0 To PolynomialDegree)      'Polynomkoeffizienten a0,...,an (a(0) = a0)
+    'polynomial coefficients a0,...,an (a(0) = a0)
+    ReDim a(0 To PolynomialDegree)
     
-    'Koeffizientenmatrix G und Konstantenvektor c aufbauen
+    'build coefficient matrix 'G' and vector of constants 'c'
     For i = 0 To PolynomialDegree
         For j = 0 To i
             G(i + 1, j + 1) = Sxk(i + j)
@@ -321,9 +314,11 @@ Private Function MasterPolynomReg( _
         c(i + 1) = Sxkyk(i)
     Next
     
-    'Gleichungssystem G * a = c lösen mit Matrixinversion
-    G1 = Application.WorksheetFunction.MInverse(G)      'Koeffizientenmatrix G invertieren
-    For i = 1 To PolynomialDegree + 1                   'Matrixmultiplikation a = G1 * c
+    '''solve system of equations 'G * a = c' with matrix inversion
+    'invert coefficient matrix 'G'
+    G1 = Application.WorksheetFunction.MInverse(G)
+   'matrix multiplication 'a = G1 * c'
+    For i = 1 To PolynomialDegree + 1
         a(i - 1) = 0
         For j = 1 To PolynomialDegree + 1
             a(i - 1) = a(i - 1) + G1(i, j) * c(j)
