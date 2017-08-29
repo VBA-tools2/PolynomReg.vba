@@ -289,12 +289,10 @@ Private Function MasterPolynomReg( _
             Sxk, xWithoutNAs, yWithoutNAs, _
             PolynomialDegree, m, UseRelativeVersion _
     )
-    For i = 0 To PolynomialDegree
-        Sxkyk(i) = 0
-        For j = 1 To m
-            Sxkyk(i) = Sxkyk(i) + xWithoutNAs(j) ^ i * yWithoutNAs(j)
-        Next
-    Next
+    Call Calculate_Sxkyk( _
+            Sxkyk, xWithoutNAs, yWithoutNAs, _
+            PolynomialDegree, m _
+    )
     
     '''produce coefficient matrix 'G' and vector of constants 'c'
     'dimension matrix with indices 0,...,PolynomialDegree;0,...,PolynomialDegree
@@ -370,6 +368,50 @@ Private Sub Calculate_Sxk( _
             Next
         Next
     End If
+    
+End Sub
+
+
+Private Sub Calculate_Sxkyk( _
+    ByRef Sxkyk() As Double, _
+    ByRef x() As Double, _
+    ByRef y() As Double, _
+    ByVal PolynomialDegree As Integer, _
+    ByVal m As Integer _
+)
+    
+    Dim i As Integer
+    Dim k As Integer
+    
+    
+    For i = 0 To PolynomialDegree
+        Sxkyk(i) = 0
+        For k = 1 To m
+            Sxkyk(i) = Sxkyk(i) + x(k) ^ i * y(k)
+        Next
+    Next
+    
+End Sub
+
+
+Private Sub Calculate_Sxkyk( _
+    ByRef Sxkyk() As Double, _
+    ByRef x() As Double, _
+    ByRef y() As Double, _
+    ByVal PolynomialDegree As Integer, _
+    ByVal m As Integer _
+)
+    
+    Dim i As Integer
+    Dim k As Integer
+    
+    
+    For i = 0 To PolynomialDegree
+        Sxkyk(i) = 0
+        For k = 1 To m
+            Sxkyk(i) = Sxkyk(i) + x(k) ^ i * y(k)
+        Next
+    Next
     
 End Sub
 
