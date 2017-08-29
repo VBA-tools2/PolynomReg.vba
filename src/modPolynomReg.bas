@@ -352,21 +352,21 @@ Private Sub Calculate_Sxk( _
 )
     
     Dim i As Integer
-    Dim j As Integer
+    Dim k As Integer
     
     
     If UseRelativeVersion = True Then
         For i = 0 To 2 * PolynomialDegree
             Sxk(i) = 0
-            For j = 1 To m      'for each data point
-                Sxk(i) = Sxk(i) + x(j) ^ i / y(j) ^ 2
+            For k = 1 To m      'for each data point
+                Sxk(i) = Sxk(i) + x(k) ^ i / y(k) ^ 2
             Next
         Next
     Else
         For i = 0 To 2 * PolynomialDegree
             Sxk(i) = 0
-            For j = 1 To m      'for each data point
-                Sxk(i) = Sxk(i) + x(j) ^ i
+            For k = 1 To m      'for each data point
+                Sxk(i) = Sxk(i) + x(k) ^ i
             Next
         Next
     End If
