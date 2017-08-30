@@ -218,20 +218,14 @@ Private Function MasterPolynomReg( _
     
     'amount of 'x' and 'y' values
     Dim CountX As Integer, CountY As Integer
-    'amount of (real) data points
-    Dim m As Integer
-    'dynamic array for the sum of powers of 'xk'
-    Dim Sxk() As Double
-    'dynamic array for the sum of powers of 'xk*yk'
-    Dim Sxkyk() As Double
-    'dynamic array for the coefficient matrix 'G'
-    Dim G() As Double, G1 As Variant
-    'dynamic array for the vector of coefficients 'c'
-    Dim c() As Double
+    Dim NoOfNonNADataPoints As Integer
+    Dim CoefficientMatrix() As Double
+    'variable for the inverse of 'CoefficientMatrix'
+    '(it has to be a variant to be able to use 'WorksheetFunction.MInverse')
+    Dim InverseCoefficientMatrix As Variant
+    Dim VectorOfConstants() As Double
     'dynamic array for the polynomial coefficients a0,...,an
     Dim a() As Double
-    'running variables
-    Dim i As Integer, j As Integer
     
     'dynamic arrays to store given 'x' and 'y' data as vectors (instead of arrays)
     Dim xAsVector() As Variant, yAsVector() As Variant
@@ -261,7 +255,9 @@ Private Function MasterPolynomReg( _
     'the polynomial coefficient must be smaller than the number of given points
     If CountX <= PolynomialDegree Then GoTo errHandler
     
-    'if 'IgnoreNA' is 'False' copy 'x' to 'xWithoutNAs' and 'y' to 'yWithoutNAs'
+    
+    'prepare vectors 'xWithoutNAs' and 'yWithoutNAs'
+    '(which are then used to calculate the polynomial coefficients)
     If IgnoreNAs = False Then
         If Not ExtractVector(x, xWithoutNAs) Then GoTo errHandler
         If Not ExtractVector(y, yWithoutNAs) Then GoTo errHandler
@@ -279,49 +275,34 @@ Private Function MasterPolynomReg( _
     
     '--------------------------------------------------------------------------
     
-    'transfer (new) number of 'x' elements to 'm'
-    m = UBound(xWithoutNAs) - LBound(xWithoutNAs) + 1
+    'transfer (new) number of 'x' elements to 'NoOfNonNADataPoints'
+    NoOfNonNADataPoints = UBound(xWithoutNAs) - LBound(xWithoutNAs) + 1
+    'check again, if number of (real) data points is smaller than the given
+    'polynomial degree
+    If NoOfNonNADataPoints <= PolynomialDegree Then GoTo errHandler
     
-    'calculate sum of powers 'xk' and 'xk*yk' and store them in corresponding arrays
-    ReDim Sxk(PolynomialDegree * 2)
-    ReDim Sxkyk(PolynomialDegree)
-    Call Calculate_Sxk( _
-            Sxk, xWithoutNAs, yWithoutNAs, _
-            PolynomialDegree, m, UseRelativeVersion _
+    CoefficientMatrix = Calculate_CoefficientMatrix( _
+            xWithoutNAs, yWithoutNAs, _
+            PolynomialDegree, _
+            NoOfNonNADataPoints, _
+            UseRelativeVersion _
     )
-    Call Calculate_Sxkyk( _
-            Sxkyk, xWithoutNAs, yWithoutNAs, _
-            PolynomialDegree, m _
+    VectorOfConstants = Calculate_VectorOfConstants( _
+            xWithoutNAs, yWithoutNAs, _
+            PolynomialDegree, _
+            NoOfNonNADataPoints _
     )
     
-    '''produce coefficient matrix 'G' and vector of constants 'c'
-    'dimension matrix with indices 0,...,PolynomialDegree;0,...,PolynomialDegree
-    ReDim G(1 To PolynomialDegree + 1, 1 To PolynomialDegree + 1)
-    'matrix for the inverse of 'G' (MINVERSE can't write back to 'G')
-    ReDim G1(1 To PolynomialDegree + 1, 1 To PolynomialDegree + 1)
-    ReDim c(1 To PolynomialDegree + 1)
-    'polynomial coefficients a0,...,an (a(0) = a0)
-    ReDim a(0 To PolynomialDegree)
+    'invert coefficient matrix 'CoefficientMatrix'
+    '(MINVERSE can't write back to 'CoefficientMatrix')
+    '(please note that the resulting array starts with index 1)
+    InverseCoefficientMatrix = Application.WorksheetFunction.MInverse(CoefficientMatrix)
     
-    'build coefficient matrix 'G' and vector of constants 'c'
-    For i = 0 To PolynomialDegree
-        For j = 0 To i
-            G(i + 1, j + 1) = Sxk(i + j)
-            G(j + 1, i + 1) = Sxk(i + j)
-        Next
-        c(i + 1) = Sxkyk(i)
-    Next
-    
-    '''solve system of equations 'G * a = c' with matrix inversion
-    'invert coefficient matrix 'G'
-    G1 = Application.WorksheetFunction.MInverse(G)
-   'matrix multiplication 'a = G1 * c'
-    For i = 1 To PolynomialDegree + 1
-        a(i - 1) = 0
-        For j = 1 To PolynomialDegree + 1
-            a(i - 1) = a(i - 1) + G1(i, j) * c(j)
-        Next
-    Next
+    a = Calculate_PolynomialCoefficients( _
+            InverseCoefficientMatrix, _
+            VectorOfConstants, _
+            PolynomialDegree _
+    )
     
     'return coefficient vector a_0,...,a_n
     If VerticalOutput = True Then
@@ -340,80 +321,130 @@ End Function
 
 
 '==============================================================================
-Private Sub Calculate_Sxk( _
-    ByRef Sxk() As Double, _
+Private Function Calculate_CoefficientMatrix( _
     ByRef x() As Double, _
     ByRef y() As Double, _
     ByVal PolynomialDegree As Integer, _
-    ByVal m As Integer, _
+    ByVal NoOfDataPoints As Integer, _
     ByVal UseRelativeVersion As Boolean _
-)
+        ) As Double()
+    
+    Dim i As Integer
+    Dim j As Integer
+    Dim SumOfPowersXK() As Double
+    Dim CoefficientMatrix() As Double
+    
+    
+    SumOfPowersXK = Calculate_SumOfPowersXK( _
+            x, y, _
+            PolynomialDegree, _
+            NoOfDataPoints, _
+            UseRelativeVersion _
+    )
+    
+    ReDim CoefficientMatrix(0 To PolynomialDegree, 0 To PolynomialDegree)
+    For i = 0 To PolynomialDegree
+        For j = 0 To i
+            CoefficientMatrix(i, j) = SumOfPowersXK(i + j)
+            CoefficientMatrix(j, i) = SumOfPowersXK(i + j)
+        Next
+    Next
+    
+    Calculate_CoefficientMatrix = CoefficientMatrix
+    
+End Function
+
+
+'calculate sum of powers 'xk' and store it in a corresponding array
+Private Function Calculate_SumOfPowersXK( _
+    ByRef x() As Double, _
+    ByRef y() As Double, _
+    ByVal PolynomialDegree As Integer, _
+    ByVal NoOfDataPoints As Integer, _
+    ByVal UseRelativeVersion As Boolean _
+        ) As Double()
     
     Dim i As Integer
     Dim k As Integer
+    Dim SumOfPowersXK() As Double
     
     
+    ReDim SumOfPowersXK(0 To 2 * PolynomialDegree)
     If UseRelativeVersion = True Then
         For i = 0 To 2 * PolynomialDegree
-            Sxk(i) = 0
-            For k = 1 To m      'for each data point
-                Sxk(i) = Sxk(i) + x(k) ^ i / y(k) ^ 2
+            SumOfPowersXK(i) = 0
+            For k = 1 To NoOfDataPoints
+                SumOfPowersXK(i) = SumOfPowersXK(i) + x(k) ^ i / y(k) ^ 2
             Next
         Next
     Else
         For i = 0 To 2 * PolynomialDegree
-            Sxk(i) = 0
-            For k = 1 To m      'for each data point
-                Sxk(i) = Sxk(i) + x(k) ^ i
+            SumOfPowersXK(i) = 0
+            For k = 1 To NoOfDataPoints
+                SumOfPowersXK(i) = SumOfPowersXK(i) + x(k) ^ i
             Next
         Next
     End If
     
-End Sub
+    Calculate_SumOfPowersXK = SumOfPowersXK
+    
+End Function
 
 
-Private Sub Calculate_Sxkyk( _
-    ByRef Sxkyk() As Double, _
+Private Function Calculate_VectorOfConstants( _
     ByRef x() As Double, _
     ByRef y() As Double, _
     ByVal PolynomialDegree As Integer, _
-    ByVal m As Integer _
-)
+    ByVal NoOfDataPoints As Integer _
+        ) As Double()
     
     Dim i As Integer
     Dim k As Integer
+    'dynamic array for the sum of powers for 'xk*yk'
+    Dim SumOfPowersXKYK() As Double
     
     
+    'calculate sum of powers 'xk*yk' and store it in a corresponding array
+    ReDim SumOfPowersXKYK(0 To PolynomialDegree)
     For i = 0 To PolynomialDegree
-        Sxkyk(i) = 0
-        For k = 1 To m
-            Sxkyk(i) = Sxkyk(i) + x(k) ^ i * y(k)
+        SumOfPowersXKYK(i) = 0
+        For k = 1 To NoOfDataPoints
+            SumOfPowersXKYK(i) = SumOfPowersXKYK(i) + x(k) ^ i * y(k)
         Next
     Next
     
-End Sub
+    'the sum of powers 'xk*yk' is the vector of constants
+    Calculate_VectorOfConstants = SumOfPowersXKYK
+    
+End Function
 
 
-Private Sub Calculate_Sxkyk( _
-    ByRef Sxkyk() As Double, _
-    ByRef x() As Double, _
-    ByRef y() As Double, _
-    ByVal PolynomialDegree As Integer, _
-    ByVal m As Integer _
-)
+'solve system of equations 'CoefficientMatrix * a = c' with matrix inversion
+Private Function Calculate_PolynomialCoefficients( _
+    ByRef InverseCoefficientMatrix As Variant, _
+    ByRef VectorOfConstants() As Double, _
+    ByVal PolynomialDegree As Integer _
+        ) As Double()
     
     Dim i As Integer
-    Dim k As Integer
+    Dim j As Integer
+    Dim a() As Double
     
     
+    'polynomial coefficients a0,...,an (a(0) = a0)
+    ReDim a(0 To PolynomialDegree)
+    
+    'matrix multiplication 'a = G_inverse * VectorOfConstants'
     For i = 0 To PolynomialDegree
-        Sxkyk(i) = 0
-        For k = 1 To m
-            Sxkyk(i) = Sxkyk(i) + x(k) ^ i * y(k)
+        a(i) = 0
+        For j = 0 To PolynomialDegree
+            a(i) = a(i) + InverseCoefficientMatrix(i + 1, j + 1) * VectorOfConstants(j)
         Next
     Next
     
-End Sub
+    Calculate_PolynomialCoefficients = a
+    
+End Function
 
 
 'function to make vectors of the ranges/arrays and optionally only transfer
@@ -440,7 +471,7 @@ Private Function ExtractVector( _
             N = UBound(DestVector) - LBound(DestVector) + 1
             If Not ChangeBoundsOfArray(DestVector, 1, N) Then Exit Function
         Case 0
-            ReDim DestVector(0)
+            ReDim DestVector(0 To 0)
             DestVector(0) = Source
         Case Else
     End Select
