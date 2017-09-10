@@ -284,13 +284,11 @@ Private Function MasterPolynomReg( _
     CoefficientMatrix = Calculate_CoefficientMatrix( _
             xWithoutNAs, yWithoutNAs, _
             PolynomialDegree, _
-            NoOfNonNADataPoints, _
             UseRelativeVersion _
     )
     VectorOfConstants = Calculate_VectorOfConstants( _
             xWithoutNAs, yWithoutNAs, _
-            PolynomialDegree, _
-            NoOfNonNADataPoints _
+            PolynomialDegree _
     )
     
     'invert coefficient matrix 'CoefficientMatrix'
@@ -325,7 +323,6 @@ Private Function Calculate_CoefficientMatrix( _
     ByRef x() As Double, _
     ByRef y() As Double, _
     ByVal PolynomialDegree As Integer, _
-    ByVal NoOfDataPoints As Integer, _
     ByVal UseRelativeVersion As Boolean _
         ) As Double()
     
@@ -338,13 +335,12 @@ Private Function Calculate_CoefficientMatrix( _
     SumOfPowersXK = Calculate_SumOfPowersXK( _
             x, y, _
             PolynomialDegree, _
-            NoOfDataPoints, _
             UseRelativeVersion _
     )
     
     ReDim CoefficientMatrix(0 To PolynomialDegree, 0 To PolynomialDegree)
-    For i = 0 To PolynomialDegree
-        For j = 0 To i
+    For i = LBound(CoefficientMatrix, 1) To UBound(CoefficientMatrix, 1)
+        For j = LBound(CoefficientMatrix, 2) To i
             CoefficientMatrix(i, j) = SumOfPowersXK(i + j)
             CoefficientMatrix(j, i) = SumOfPowersXK(i + j)
         Next
@@ -360,7 +356,6 @@ Private Function Calculate_SumOfPowersXK( _
     ByRef x() As Double, _
     ByRef y() As Double, _
     ByVal PolynomialDegree As Integer, _
-    ByVal NoOfDataPoints As Integer, _
     ByVal UseRelativeVersion As Boolean _
         ) As Double()
     
@@ -371,16 +366,16 @@ Private Function Calculate_SumOfPowersXK( _
     
     ReDim SumOfPowersXK(0 To 2 * PolynomialDegree)
     If UseRelativeVersion = True Then
-        For i = 0 To 2 * PolynomialDegree
+        For i = LBound(SumOfPowersXK) To UBound(SumOfPowersXK)
             SumOfPowersXK(i) = 0
-            For k = 1 To NoOfDataPoints
+            For k = LBound(x) To UBound(x)
                 SumOfPowersXK(i) = SumOfPowersXK(i) + x(k) ^ i / y(k) ^ 2
             Next
         Next
     Else
-        For i = 0 To 2 * PolynomialDegree
+        For i = LBound(SumOfPowersXK) To UBound(SumOfPowersXK)
             SumOfPowersXK(i) = 0
-            For k = 1 To NoOfDataPoints
+            For k = LBound(x) To UBound(x)
                 SumOfPowersXK(i) = SumOfPowersXK(i) + x(k) ^ i
             Next
         Next
@@ -394,8 +389,7 @@ End Function
 Private Function Calculate_VectorOfConstants( _
     ByRef x() As Double, _
     ByRef y() As Double, _
-    ByVal PolynomialDegree As Integer, _
-    ByVal NoOfDataPoints As Integer _
+    ByVal PolynomialDegree As Integer _
         ) As Double()
     
     Dim i As Integer
@@ -406,9 +400,9 @@ Private Function Calculate_VectorOfConstants( _
     
     'calculate sum of powers 'xk*yk' and store it in a corresponding array
     ReDim SumOfPowersXKYK(0 To PolynomialDegree)
-    For i = 0 To PolynomialDegree
+    For i = LBound(SumOfPowersXKYK) To UBound(SumOfPowersXKYK)
         SumOfPowersXKYK(i) = 0
-        For k = 1 To NoOfDataPoints
+        For k = LBound(x) To UBound(x)
             SumOfPowersXKYK(i) = SumOfPowersXKYK(i) + x(k) ^ i * y(k)
         Next
     Next
@@ -435,9 +429,9 @@ Private Function Calculate_PolynomialCoefficients( _
     ReDim a(0 To PolynomialDegree)
     
     'matrix multiplication 'a = G_inverse * VectorOfConstants'
-    For i = 0 To PolynomialDegree
+    For i = LBound(a) To UBound(a)
         a(i) = 0
-        For j = 0 To PolynomialDegree
+        For j = LBound(a) To UBound(a)
             a(i) = a(i) + InverseCoefficientMatrix(i + 1, j + 1) * VectorOfConstants(j)
         Next
     Next
