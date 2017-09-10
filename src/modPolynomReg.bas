@@ -75,16 +75,19 @@ Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 +
     
     If Not ExtractVector(Coefficients, arrCoeffs) Then GoTo errHandler
     
-    'if 'NA' is present and its value is 'TRUE' then remove all trailing 'NAs' lines
-    If Not IsMissing(NA) Then
-        'this only makes sense if more than one coefficient is given
-        If NA = True Then
-            If Not RemoveNALines(arrCoeffs) Then GoTo errHandler
-        End If
+    'if 'NA' is 'TRUE' then remove all trailing 'NAs' lines
+    '(this only makes sense if more than one coefficient is given)
+    If NA = True Then
+        If Not RemoveNALines(arrCoeffs) Then GoTo errHandler
     End If
+    If Not IsVariantArrayNumeric(arrCoeffs) Then GoTo errHandler
     
-    'check, if the coefficients are a scalar or a vector
-    'if it is a scalar use the simple form
+'---
+'TODO:
+'- check, if the coefficients are a scalar or a vector
+'  if it is a scalar use the simple form
+'  --> maybe this has to be tested earlier as well in 'ExtractVector'?
+'---
     For i = LBound(arrCoeffs) To UBound(arrCoeffs)
         sum = sum + arrCoeffs(i) * x ^ (i - LBound(arrCoeffs))
     Next
@@ -261,6 +264,8 @@ Private Function MasterPolynomReg( _
     'prepare vectors 'xWithoutNAs' and 'yWithoutNAs'
     '(which are then used to calculate the polynomial coefficients)
     If IgnoreNAs = False Then
+        If Not IsVariantArrayNumeric(x) Then GoTo errHandler
+        If Not IsVariantArrayNumeric(y) Then GoTo errHandler
         If Not ExtractVector(x, xWithoutNAs) Then GoTo errHandler
         If Not ExtractVector(y, yWithoutNAs) Then GoTo errHandler
     Else
