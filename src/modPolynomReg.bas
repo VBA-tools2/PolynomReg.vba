@@ -225,7 +225,9 @@ Private Function MasterPolynomReg( _
     Dim InverseCoefficientMatrix As Variant
     Dim VectorOfConstants() As Double
     'dynamic array for the polynomial coefficients a0,...,an
-    Dim a() As Double
+    '(it has to be of type Variant' because of the special handler for
+    ' 'PolynomialDegree = 0')
+    Dim a() As Variant
     
     'dynamic arrays to store given 'x' and 'y' data as vectors (instead of arrays)
     Dim xAsVector() As Variant, yAsVector() As Variant
@@ -234,8 +236,8 @@ Private Function MasterPolynomReg( _
     
     
     '---
-    ''PolynomialDegree' has to be an integer >= 1
-    If PolynomialDegree < 1 Then
+    ''PolynomialDegree' has to be an integer >= 0
+    If PolynomialDegree < 0 Then
         GoTo errHandler
     End If
     '---
@@ -301,6 +303,10 @@ Private Function MasterPolynomReg( _
             VectorOfConstants, _
             PolynomialDegree _
     )
+    
+    If PolynomialDegree = 0 Then
+        Call HandleSpecialCaseForPolynomialDegreeEqualsZero(a)
+    End If
     
     'return coefficient vector a_0,...,a_n
     If VerticalOutput = True Then
@@ -418,28 +424,53 @@ Private Function Calculate_PolynomialCoefficients( _
     ByRef InverseCoefficientMatrix As Variant, _
     ByRef VectorOfConstants() As Double, _
     ByVal PolynomialDegree As Integer _
-        ) As Double()
+        ) As Variant
     
     Dim i As Integer
     Dim j As Integer
-    Dim a() As Double
+    Dim a() As Variant
     
     
     'polynomial coefficients a0,...,an (a(0) = a0)
     ReDim a(0 To PolynomialDegree)
     
     'matrix multiplication 'a = G_inverse * VectorOfConstants'
-    For i = LBound(a) To UBound(a)
-        a(i) = 0
-        For j = LBound(a) To UBound(a)
-            a(i) = a(i) + InverseCoefficientMatrix(i + 1, j + 1) * VectorOfConstants(j)
+'---
+'<https://stackoverflow.com/a/7307992>
+'   a = WorksheetFunction.MMult(InverseCoefficientMatrix, VectorOfConstants)
+'---
+    'as a reminder: 'InverseCoefficientMatrix' is a 1-based array
+    'which is coming from 'WorksheetFunction.MInverse'
+    'it is also needed a special handler for 'PolynomialDegree = 0' because of
+    'an anomaly (bug?) in Excel, where a 1D array (z(1 to ..., 1 to 1)) is
+    'returned as vector (z(1 to ...)) after inversion with 'WorksheetFunction.MInverse'
+    '(see <https://stackoverflow.com/a/28800474/5776000>)
+    If PolynomialDegree = 0 Then
+        a(0) = InverseCoefficientMatrix(1) * VectorOfConstants(0)
+    Else
+        For i = LBound(a) To UBound(a)
+            a(i) = 0
+            For j = LBound(a) To UBound(a)
+                a(i) = a(i) + InverseCoefficientMatrix(i + 1, j + 1) * VectorOfConstants(j)
+            Next
         Next
-    Next
+    End If
     
     Calculate_PolynomialCoefficients = a
     
 End Function
 
+
+'needed because otherwise the returned array will consist of the a(0) value in
+'*all* cells (and not '#NA' values for the "unused coefficients)
+Private Sub HandleSpecialCaseForPolynomialDegreeEqualsZero( _
+    a() As Variant _
+)
+    
+    ReDim Preserve a(0 To 1)
+    a(1) = CVErr(xlErrNA)
+    
+End Sub
 
 'function to make vectors of the ranges/arrays and optionally only transfer
 'non-NA values
