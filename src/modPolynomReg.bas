@@ -70,6 +70,16 @@ Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 +
     Dim arrCoeffs() As Variant
     
     
+    '---
+    'NA' must be a boolean
+    If IsMissing(NA) Or IsEmpty(NA) Then
+        NA = False
+    ElseIf Not VariableType(NA) = "Boolean" Then
+        GoTo errHandler
+    End If
+    '---
+    
+    
     'convert possible range to array
     Coefficients = Coefficients
     
