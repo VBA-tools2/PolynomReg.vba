@@ -439,7 +439,7 @@ End Function
 
 'solve system of equations 'CoefficientMatrix * a = c' with matrix inversion
 Private Function Calculate_PolynomialCoefficients( _
-    ByRef InverseCoefficientMatrix As Variant, _
+    ByVal InverseCoefficientMatrix As Variant, _
     ByRef VectorOfConstants() As Double, _
     ByVal PolynomialDegree As Long _
         ) As Variant
@@ -525,8 +525,8 @@ End Function
 
 
 Private Function CopyOnlyNonNALines( _
-    ByRef xSource As Variant, _
-    ByRef ySource As Variant, _
+    ByVal xSource As Variant, _
+    ByVal ySource As Variant, _
     ByRef xDest As Variant, _
     ByRef yDest As Variant, _
     ByVal PolynomialDegree As Long _
