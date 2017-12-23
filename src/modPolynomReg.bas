@@ -12,7 +12,7 @@ Option Explicit
 'and the function 'modUsefulFunctions.VariableType'
 '==============================================================================
 
-Sub AddUDFToCustomCategory()
+Public Sub AddUDFToCustomCategory()
     
     '==========================================================================
     'how should the category be named?
@@ -124,7 +124,7 @@ End Function
 '                     polynomial coefficients
 '- IgnoreNAs        = optional argument to ignore "NA" data points
 'The result will be returned as array (vector)
-Function PolynomReg( _
+Public Function PolynomReg( _
     x As Variant, _
     y As Variant, _
     PolynomialDegree As Long, _
@@ -177,7 +177,7 @@ End Function
 '                     polynomial coefficients
 '- IgnoreNAs        = optional argument to ignore "NA" data points
 'The result will be returned as array (vector)
-Function PolynomRegRel( _
+Public Function PolynomRegRel( _
     x As Variant, _
     y As Variant, _
     PolynomialDegree As Long, _
