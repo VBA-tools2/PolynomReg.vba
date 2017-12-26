@@ -59,9 +59,9 @@ End Sub
 
 
 Public Function Polynom( _
-    Coefficients As Variant, _
-    x As Double, _
-    Optional NA As Variant _
+    ByVal Coefficients As Variant, _
+    ByVal x As Double, _
+    Optional ByVal NA As Variant _
         ) As Variant
 Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 + a1*x + a2*x^2 + ... + an*x^n"
     
@@ -125,11 +125,11 @@ End Function
 '- IgnoreNAs        = optional argument to ignore "NA" data points
 'The result will be returned as array (vector)
 Public Function PolynomReg( _
-    x As Variant, _
-    y As Variant, _
-    PolynomialDegree As Long, _
-    Optional VerticalOutput As Variant, _
-    Optional IgnoreNAs As Variant _
+    ByVal x As Variant, _
+    ByVal y As Variant, _
+    ByVal PolynomialDegree As Long, _
+    Optional ByVal VerticalOutput As Variant, _
+    Optional ByVal IgnoreNAs As Variant _
         ) As Variant
 Attribute PolynomReg.VB_Description = "Calculates polynomial coefficients (a0,...,an)"
     
@@ -178,11 +178,11 @@ End Function
 '- IgnoreNAs        = optional argument to ignore "NA" data points
 'The result will be returned as array (vector)
 Public Function PolynomRegRel( _
-    x As Variant, _
-    y As Variant, _
-    PolynomialDegree As Long, _
-    Optional VerticalOutput As Variant, _
-    Optional IgnoreNAs As Variant _
+    ByVal x As Variant, _
+    ByVal y As Variant, _
+    ByVal PolynomialDegree As Long, _
+    Optional ByVal VerticalOutput As Variant, _
+    Optional ByVal IgnoreNAs As Variant _
         ) As Variant
 Attribute PolynomRegRel.VB_Description = "Calculates polynomial coefficients (a0,...,an)"
 Attribute PolynomRegRel.VB_ProcData.VB_Invoke_Func = " \n3"
@@ -221,12 +221,12 @@ End Function
 
 
 Private Function MasterPolynomReg( _
-    x As Variant, _
-    y As Variant, _
-    PolynomialDegree As Long, _
-    VerticalOutput As Boolean, _
-    IgnoreNAs As Boolean, _
-    UseRelativeVersion As Boolean _
+    ByVal x As Variant, _
+    ByVal y As Variant, _
+    ByVal PolynomialDegree As Long, _
+    ByVal VerticalOutput As Boolean, _
+    ByVal IgnoreNAs As Boolean, _
+    ByVal UseRelativeVersion As Boolean _
         ) As Variant
     
     'amount of 'x' and 'y' values
@@ -482,7 +482,7 @@ End Function
 'needed because otherwise the returned array will consist of the a(0) value in
 '*all* cells (and not '#NA' values for the "unused coefficients)
 Private Sub HandleSpecialCaseForPolynomialDegreeEqualsZero( _
-    a() As Variant _
+    ByRef a() As Variant _
 )
     
     ReDim Preserve a(0 To 1)
@@ -493,8 +493,8 @@ End Sub
 'function to make vectors of the ranges/arrays and optionally only transfer
 'non-NA values
 Private Function ExtractVector( _
-    Source As Variant, _
-    DestVector As Variant _
+    ByVal Source As Variant, _
+    ByRef DestVector As Variant _
         ) As Boolean
     
     Dim N As Long
@@ -572,7 +572,7 @@ Private Function CopyOnlyNonNALines( _
 End Function
 
 
-Private Function RemoveNALines(Arr As Variant) As Boolean
+Private Function RemoveNALines(ByRef Arr As Variant) As Boolean
     
     Dim i As Long
     

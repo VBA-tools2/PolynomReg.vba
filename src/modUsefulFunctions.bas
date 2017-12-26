@@ -10,7 +10,7 @@ Option Base 1
 '(inspired by ...)
 '<http://spreadsheetpage.com/index.php/tip/determining_the_data_type_of_a_cell/>
 '<https://stackoverflow.com/a/1994169>
-Public Function VariableType(c As Variant) As String
+Public Function VariableType(ByVal c As Variant) As String
 '    Application.Volatile
     
     If TypeName(c) = "Range" Then
