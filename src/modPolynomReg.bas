@@ -558,7 +558,7 @@ Private Function CopyOnlyNonNALines( _
         End If
     Next
     
-    'redim 'xDest' and 'yDest' to only the populated values
+    'ReDim 'xDest' and 'yDest' to only the populated values
     ReDim Preserve xDest(1 To j)
     ReDim Preserve yDest(1 To j)
     
@@ -592,9 +592,13 @@ Private Function RemoveNALines(ByRef Arr As Variant) As Boolean
         End If
     Next
     
-    'redim 'Arr' to the numeric values only
-    ReDim Preserve Arr(LBound(Arr) To i)
-    
-    RemoveNALines = True
+    'it could be the case that *all* lines are removed
+    If i >= LBound(Arr) Then
+        'ReDim 'Arr' to the numeric values only
+        ReDim Preserve Arr(LBound(Arr) To i)
+        RemoveNALines = True
+    Else
+        RemoveNALines = False
+    End If
     
 End Function
