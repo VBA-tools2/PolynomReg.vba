@@ -148,6 +148,30 @@ TestFail:
 End Sub
 
 '@TestMethod
+Public Sub PolynomReg_Order1Transposed_ReturnsArrayOfTransposedValues()
+    On Error GoTo TestFail
+    
+    'Arrange:
+    vXData = Array(0, 1)
+    vYData = Array(2, 3)
+    aExpected = Array(2, 1)
+    
+    'Act:
+    aExpected = Application.WorksheetFunction.Transpose(aExpected)
+    aActual = modPolynomReg.PolynomReg(vXData, vYData, 1, True)
+    
+    'Assert:
+    For i = LBound(aActual) To UBound(aActual)
+        Assert.AreEqual CDbl(aExpected(i, 1)), CDbl(aActual(i, 1))
+    Next
+    
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
 Public Sub PolynomReg_Order1WithNA_ReturnsArrayOfValues()
     On Error GoTo TestFail
     
