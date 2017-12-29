@@ -12,6 +12,7 @@ Private vYData As Variant
 Private vCoeffs As Variant
 Private aExpected As Variant
 Private aActual As Variant
+Private i As Long
 
 '@ModuleInitialize
 Public Sub ModuleInitialize()
@@ -113,8 +114,9 @@ Public Sub PolynomReg_Order0_ReturnsValue()
     aActual = modPolynomReg.PolynomReg(vXData, vYData, 0)
     
     'Assert:
-    Assert.AreEqual CDbl(aExpected(0)), CDbl(aActual(0))
-    Assert.AreEqual CDbl(aExpected(1)), CDbl(aActual(1))
+    For i = LBound(aActual) To UBound(aActual)
+        Assert.AreEqual CDbl(aExpected(i)), CDbl(aActual(i))
+    Next
     
 TestExit:
     Exit Sub
@@ -135,8 +137,9 @@ Public Sub PolynomReg_Order1_ReturnsArrayOfValues()
     aActual = modPolynomReg.PolynomReg(vXData, vYData, 1)
     
     'Assert:
-    Assert.AreEqual CDbl(aExpected(0)), CDbl(aActual(0))
-    Assert.AreEqual CDbl(aExpected(1)), CDbl(aActual(1))
+    For i = LBound(aActual) To UBound(aActual)
+        Assert.AreEqual CDbl(aExpected(i)), CDbl(aActual(i))
+    Next
     
 TestExit:
     Exit Sub
@@ -157,8 +160,9 @@ Public Sub PolynomReg_Order1WithNA_ReturnsArrayOfValues()
     aActual = modPolynomReg.PolynomReg(vXData, vYData, 1, , True)
     
     'Assert:
-    Assert.AreEqual CDbl(aExpected(0)), CDbl(aActual(0))
-    Assert.AreEqual CDbl(aExpected(1)), CDbl(aActual(1))
+    For i = LBound(aActual) To UBound(aActual)
+        Assert.AreEqual CDbl(aExpected(i)), CDbl(aActual(i))
+    Next
     
 TestExit:
     Exit Sub
@@ -182,8 +186,9 @@ Public Sub PolynomReg_Order2_ReturnsArrayOfValues()
     'TODO: for whatever reason the following results 'FALSE'
 '    Assert.AreEqual CDbl(aExpected(0)), CDbl(aActual(0))
     Assert.IsTrue Abs(aExpected(0) - aActual(0)) < 0.000000001
-    Assert.AreEqual CDbl(aExpected(1)), CDbl(aActual(1))
-    Assert.AreEqual CDbl(aExpected(2)), CDbl(aActual(2))
+    For i = LBound(aActual) + 1 To UBound(aActual)
+        Assert.AreEqual CDbl(aExpected(i)), CDbl(aActual(i))
+    Next
     
 TestExit:
     Exit Sub
