@@ -230,6 +230,8 @@ Private Function MasterPolynomReg( _
     ByVal UseRelativeVersion As Boolean _
         ) As Variant
     
+    Dim xArr As Variant
+    Dim yArr As Variant
     'amount of 'x' and 'y' values
     Dim CountX As Long
     Dim CountY As Long
@@ -260,15 +262,23 @@ Private Function MasterPolynomReg( _
     '---
     
     
-    'convert 'x' and 'y' to arrays (in case they are ranges)
-    x = x
-    y = y
+    'convert 'x' and 'y' to arrays if they are ranges
+    If TypeName(x) = "Range" Then
+        xArr = RangeToArray(x)
+    Else
+        xArr = x
+    End If
+    If TypeName(y) = "Range" Then
+        yArr = RangeToArray(y)
+    Else
+        yArr = y
+    End If
     
     'count number of data points in given arrays
-    CountX = UBound(x) - LBound(x) + 1
-    CountY = UBound(y) - LBound(y) + 1
+    CountX = UBound(xArr) - LBound(xArr) + 1
+    CountY = UBound(yArr) - LBound(yArr) + 1
     
-    'the number of points has to be identical for 'x' and 'y'
+    'the number of points has to be identical for 'xArr' and 'yArr'
     If CountX <> CountY Then GoTo errHandler
     
     'the polynomial coefficient must be smaller than the number of given points
@@ -278,14 +288,14 @@ Private Function MasterPolynomReg( _
     'prepare vectors 'xWithoutNAs' and 'yWithoutNAs'
     '(which are then used to calculate the polynomial coefficients)
     If IgnoreNAs = False Then
-        If Not IsArrayAllNumeric(x) Then GoTo errHandler
-        If Not IsArrayAllNumeric(y) Then GoTo errHandler
-        If Not ExtractVector(x, xWithoutNAs) Then GoTo errHandler
-        If Not ExtractVector(y, yWithoutNAs) Then GoTo errHandler
+        If Not IsArrayAllNumeric(xArr) Then GoTo errHandler
+        If Not IsArrayAllNumeric(yArr) Then GoTo errHandler
+        If Not ExtractVector(xArr, xWithoutNAs) Then GoTo errHandler
+        If Not ExtractVector(yArr, yWithoutNAs) Then GoTo errHandler
     Else
-        'else copy 'x' to 'xAsVector' and 'y' to 'yAsVector'
-        If Not ExtractVector(x, xAsVector) Then GoTo errHandler
-        If Not ExtractVector(y, yAsVector) Then GoTo errHandler
+        'else copy 'xArr' to 'xAsVector' and 'yArr' to 'yAsVector'
+        If Not ExtractVector(xArr, xAsVector) Then GoTo errHandler
+        If Not ExtractVector(yArr, yAsVector) Then GoTo errHandler
         
         If Not CopyOnlyNonNALines( _
                 xAsVector, yAsVector, _

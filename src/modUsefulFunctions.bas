@@ -3,6 +3,21 @@ Attribute VB_Name = "modUsefulFunctions"
 Option Explicit
 Option Base 1
 
+'<https://codereview.stackexchange.com/a/161784>
+Public Function RangeToArray(ByVal target As Range) As Variant
+    If target.Rows.Count = 1 Then
+        'horizontal 1D range
+        RangeToArray = Application.WorksheetFunction.Transpose( _
+                Application.WorksheetFunction.Transpose(target.Value) _
+        )
+    ElseIf target.Columns.Count = 1 Then
+        'vertical 1D range
+        RangeToArray = Application.WorksheetFunction.Transpose(target.Value)
+    Else
+        '2D array: let Excel do the conversion itself
+        RangeToArray = target.Value
+    End If
+End Function
 
 '==============================================================================
 'Returns the variable type of the given parameter
