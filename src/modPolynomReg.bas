@@ -91,7 +91,7 @@ Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 +
     If NA = True Then
         If Not RemoveNALines(arrCoeffs) Then GoTo errHandler
     End If
-    If Not IsVariantArrayNumeric(arrCoeffs) Then GoTo errHandler
+    If Not IsArrayAllNumeric(arrCoeffs) Then GoTo errHandler
     
 '---
 'TODO:
@@ -278,8 +278,8 @@ Private Function MasterPolynomReg( _
     'prepare vectors 'xWithoutNAs' and 'yWithoutNAs'
     '(which are then used to calculate the polynomial coefficients)
     If IgnoreNAs = False Then
-        If Not IsVariantArrayNumeric(x) Then GoTo errHandler
-        If Not IsVariantArrayNumeric(y) Then GoTo errHandler
+        If Not IsArrayAllNumeric(x) Then GoTo errHandler
+        If Not IsArrayAllNumeric(y) Then GoTo errHandler
         If Not ExtractVector(x, xWithoutNAs) Then GoTo errHandler
         If Not ExtractVector(y, yWithoutNAs) Then GoTo errHandler
     Else
