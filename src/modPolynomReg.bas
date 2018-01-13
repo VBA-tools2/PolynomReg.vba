@@ -5,6 +5,7 @@ Option Explicit
 'module originally from Gerhard Krucker which was created 17.08.1995, 22.09.1996
 'and 2004 for VBA in EXCEL7. It was highly modified by Stefan Pinnow in 2016
 'and 2017.
+'<http://www.krucker.ch/skripten-uebungen/IAMSkript/IAMKap3.pdf>
 
 '==============================================================================
 'requires the 'modArraySupport' module from Chip Pearson available at
