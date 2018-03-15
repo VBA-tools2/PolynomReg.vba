@@ -8,9 +8,20 @@ Option Explicit
 '<http://www.krucker.ch/skripten-uebungen/IAMSkript/IAMKap3.pdf>
 
 '==============================================================================
-'requires the 'modArraySupport' module from Chip Pearson available at
-'<http://www.cpearson.com/excel/VBAArrays.htm>
-'and the function 'modUsefulFunctions.VariableType'
+'requires the functions
+'- ChangeBoundsOfVector
+'- CopyArray
+'- GetColumn
+'- GetRow
+'- IsArrayAllNumeric
+'- NumberOfArrayDimensions
+'from the revised 'modArraySupport2' module from Chip Pearson originally
+'available at
+'  <http://www.cpearson.com/excel/VBAArrays.htm>
+'and the functions
+'- RangeToArray
+'- VariableType
+'from the 'modUsefulFunctions' module
 '==============================================================================
 
 Public Sub AddUDFToCustomCategory()
@@ -523,7 +534,7 @@ Private Function ExtractVector( _
         Case 1
             If Not CopyArray(Source, DestVector, True) Then Exit Function
             N = UBound(DestVector) - LBound(DestVector) + 1
-            If Not ChangeBoundsOfArray(DestVector, 1, N) Then Exit Function
+            If Not ChangeBoundsOfVector(DestVector, 1, N) Then Exit Function
         Case 0
             ReDim DestVector(0 To 0)
             DestVector(0) = Source
