@@ -46,8 +46,12 @@ Public Function VariableType(ByVal c As Variant) As String
 '        Case InStr(1, c.text, ":") <> 0
 '            VariableType = "Time"
         Case IsNumeric(c)
-            If c = Int(c) Then
-                VariableType = "Integer"
+            If c = CLng(c) Then
+                If Abs(c) <= 32767 Then
+                    VariableType = "Integer"
+                Else
+                    VariableType = "Long"
+                End If
             Else
                 VariableType = "Double"
             End If
