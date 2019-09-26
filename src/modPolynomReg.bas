@@ -73,7 +73,7 @@ End Sub
 Public Function Polynom( _
     ByVal Coefficients As Variant, _
     ByVal x As Double, _
-    Optional ByVal NA As Variant _
+    Optional ByVal IgnoreNA As Variant _
         ) As Variant
 Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 + a1*x + a2*x^2 + ... + an*x^n"
     
@@ -83,10 +83,10 @@ Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 +
     
     
     '---
-    'NA' must be a boolean
-    If IsMissing(NA) Or IsEmpty(NA) Then
-        NA = False
-    ElseIf Not VariableType(NA) = "Boolean" Then
+    'IgnoreNA' must be a boolean
+    If IsMissing(IgnoreNA) Or IsEmpty(IgnoreNA) Then
+        IgnoreNA = False
+    ElseIf Not VariableType(IgnoreNA) = "Boolean" Then
         GoTo errHandler
     End If
     '---
@@ -97,9 +97,9 @@ Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 +
     
     If Not ExtractVector(Coefficients, arrCoeffs) Then GoTo errHandler
     
-    'if 'NA' is 'TRUE' then remove all trailing 'NAs' lines
+    'if 'IgnoreNA' is 'TRUE' then remove all trailing 'NAs' lines
     '(this only makes sense if more than one coefficient is given)
-    If NA = True Then
+    If IgnoreNA = True Then
         If Not RemoveNALines(arrCoeffs) Then GoTo errHandler
     End If
     If Not IsArrayAllNumeric(arrCoeffs) Then GoTo errHandler
