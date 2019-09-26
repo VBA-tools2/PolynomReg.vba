@@ -70,6 +70,7 @@ Public Sub AddUDFToCustomCategory()
 End Sub
 
 
+'@Description("Calculates polynomial expression f(x) = a0 + a1*x + a2*x^2 + ... + an*x^n")
 Public Function Polynom( _
     ByVal Coefficients As Variant, _
     ByVal x As Double, _
@@ -136,6 +137,7 @@ End Function
 '                     polynomial coefficients
 '- IgnoreNAs        = optional argument to ignore "NA" data points
 'The result will be returned as array (vector)
+'@Description("Calculates polynomial coefficients (a0,...,an)")
 Public Function PolynomReg( _
     ByVal x As Variant, _
     ByVal y As Variant, _
@@ -189,6 +191,7 @@ End Function
 '                     polynomial coefficients
 '- IgnoreNAs        = optional argument to ignore "NA" data points
 'The result will be returned as array (vector)
+'@Description("Calculates polynomial coefficients (a0,...,an)")
 Public Function PolynomRegRel( _
     ByVal x As Variant, _
     ByVal y As Variant, _
