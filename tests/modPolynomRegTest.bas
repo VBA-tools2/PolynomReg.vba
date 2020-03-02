@@ -38,7 +38,7 @@ End Sub
 'unit tests for `PolynomReg'
 '==============================================================================
 
-'@TestMethod
+'@TestMethod("PolynomReg")
 Public Sub PolynomReg_OnlyNAValues_ReturnsError()
     On Error GoTo TestFail
     
@@ -59,7 +59,7 @@ TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
 
-'@TestMethod
+'@TestMethod("PolynomReg")
 Public Sub PolynomReg_OnlyInvalidValues_ReturnsError()
     On Error GoTo TestFail
     
@@ -80,7 +80,7 @@ TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
 
-'@TestMethod
+'@TestMethod("PolynomReg")
 Public Sub PolynomReg_OnlyInvalidValuesWithNA_ReturnsError()
     On Error GoTo TestFail
     
@@ -101,7 +101,7 @@ TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
 
-'@TestMethod
+'@TestMethod("PolynomReg")
 Public Sub PolynomReg_Order0_ReturnsValue()
     On Error GoTo TestFail
     
@@ -124,7 +124,7 @@ TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
 
-'@TestMethod
+'@TestMethod("PolynomReg")
 Public Sub PolynomReg_Order1_ReturnsArrayOfValues()
     On Error GoTo TestFail
     
@@ -147,7 +147,7 @@ TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
 
-'@TestMethod
+'@TestMethod("PolynomReg")
 Public Sub PolynomReg_Order1Transposed_ReturnsArrayOfTransposedValues()
     On Error GoTo TestFail
     
@@ -171,7 +171,7 @@ TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
 
-'@TestMethod
+'@TestMethod("PolynomReg")
 Public Sub PolynomReg_Order1WithNA_ReturnsArrayOfValues()
     On Error GoTo TestFail
     
@@ -194,7 +194,7 @@ TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
 
-'@TestMethod
+'@TestMethod("PolynomReg")
 Public Sub PolynomReg_Order2_ReturnsArrayOfValues()
     On Error GoTo TestFail
     
@@ -224,7 +224,7 @@ End Sub
 'unit tests for `Polynom'
 '==============================================================================
 
-'@TestMethod
+'@TestMethod("Polynom")
 Public Sub Polynom_OnlyNACoeff_ReturnsError()
     On Error GoTo TestFail
     
@@ -245,7 +245,7 @@ TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
 
-'@TestMethod
+'@TestMethod("Polynom")
 Public Sub Polynom_OnlyNACoeffWithNA_ReturnsError()
     On Error GoTo TestFail
     
@@ -266,7 +266,7 @@ TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
 
-'@TestMethod
+'@TestMethod("Polynom")
 Public Sub Polynom_OnlyNumError_ReturnsError()
     On Error GoTo TestFail
     
@@ -287,7 +287,7 @@ TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
 
-'@TestMethod
+'@TestMethod("Polynom")
 Public Sub Polynom_1ValidValue_ReturnsValue()
     On Error GoTo TestFail
     
@@ -308,7 +308,7 @@ TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
 
-'@TestMethod
+'@TestMethod("Polynom")
 Public Sub Polynom_2ValidValues_ReturnsValue()
     On Error GoTo TestFail
     
@@ -329,7 +329,7 @@ TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
 
-'@TestMethod
+'@TestMethod("Polynom")
 Public Sub Polynom_2ValidValuesPlusNA_ReturnsError()
     On Error GoTo TestFail
     
@@ -350,7 +350,7 @@ TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
 
-'@TestMethod
+'@TestMethod("Polynom")
 Public Sub Polynom_2ValidValuesPlusNAWithNA_ReturnsValue()
     On Error GoTo TestFail
     
@@ -371,7 +371,7 @@ TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
 
-'@TestMethod
+'@TestMethod("Polynom")
 Public Sub Polynom_2ValidValuesPlusNAInBetweenWithNA_ReturnsError()
     On Error GoTo TestFail
     
