@@ -4,7 +4,7 @@ Option Explicit
 Option Private Module
 
 '@TestModule
-'@Folder("Tests")
+'@Folder("PolynomReg.Tests")
 
 Private Assert As New Rubberduck.AssertClass
 Private vXData As Variant

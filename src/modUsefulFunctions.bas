@@ -1,5 +1,7 @@
 Attribute VB_Name = "modUsefulFunctions"
 
+'@Folder("PolynomReg")
+
 Option Explicit
 Option Base 1
 

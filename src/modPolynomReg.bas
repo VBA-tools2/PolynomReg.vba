@@ -1,5 +1,7 @@
 Attribute VB_Name = "modPolynomReg"
 
+'@Folder("PolynomReg")
+
 Option Explicit
 
 'module originally from Gerhard Krucker which was created 17.08.1995, 22.09.1996
