@@ -80,11 +80,6 @@ Public Function Polynom( _
         ) As Variant
 Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 + a1*x + a2*x^2 + ... + an*x^n"
     
-    Dim i As Long
-    Dim sum As Double
-    Dim arrCoeffs() As Variant
-    
-    
     '---
     'IgnoreNA' must be a boolean
     If IsMissing(IgnoreNA) Or IsEmpty(IgnoreNA) Then
@@ -98,6 +93,7 @@ Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 +
     'convert possible range to array
     Coefficients = Coefficients
     
+    Dim arrCoeffs() As Variant
     If Not ExtractVector(Coefficients, arrCoeffs) Then GoTo errHandler
     
     'if 'IgnoreNA' is 'TRUE' then remove all trailing 'NAs' lines
@@ -113,7 +109,9 @@ Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 +
 '  if it is a scalar use the simple form
 '  --> maybe this has to be tested earlier as well in 'ExtractVector'?
 '---
+    Dim i As Long
     For i = LBound(arrCoeffs) To UBound(arrCoeffs)
+        Dim sum As Double
         sum = sum + arrCoeffs(i) * x ^ (i - LBound(arrCoeffs))
     Next
     
@@ -246,30 +244,6 @@ Private Function MasterPolynomReg( _
     ByVal UseRelativeVersion As Boolean _
         ) As Variant
     
-    Dim xArr As Variant
-    Dim yArr As Variant
-    'amount of 'x' and 'y' values
-    Dim CountX As Long
-    Dim CountY As Long
-    Dim NoOfNonNADataPoints As Long
-    Dim CoefficientMatrix() As Double
-    'variable for the inverse of 'CoefficientMatrix'
-    '(it has to be a variant to be able to use 'WorksheetFunction.MInverse')
-    Dim InverseCoefficientMatrix As Variant
-    Dim VectorOfConstants() As Double
-    'dynamic array for the polynomial coefficients a0,...,an
-    '(it has to be of type Variant' because of the special handler for
-    ' 'PolynomialDegree = 0')
-    Dim a() As Variant
-    
-    'dynamic arrays to store given 'x' and 'y' data as vectors (instead of arrays)
-    Dim xAsVector() As Variant
-    Dim yAsVector() As Variant
-    'dynamic arrays to store given data revised by 'NA' data
-    Dim xWithoutNAs() As Double
-    Dim yWithoutNAs() As Double
-    
-    
     '---
     ''PolynomialDegree' has to be an integer >= 0
     If PolynomialDegree < 0 Then
@@ -280,18 +254,22 @@ Private Function MasterPolynomReg( _
     
     'convert 'x' and 'y' to arrays if they are ranges
     If TypeName(x) = "Range" Then
+        Dim xArr As Variant
         xArr = RangeToArray(x)
     Else
         xArr = x
     End If
     If TypeName(y) = "Range" Then
+        Dim yArr As Variant
         yArr = RangeToArray(y)
     Else
         yArr = y
     End If
     
     'count number of data points in given arrays
+    Dim CountX As Long
     CountX = UBound(xArr) - LBound(xArr) + 1
+    Dim CountY As Long
     CountY = UBound(yArr) - LBound(yArr) + 1
     
     'the number of points has to be identical for 'xArr' and 'yArr'
@@ -306,11 +284,16 @@ Private Function MasterPolynomReg( _
     If IgnoreNAs = False Then
         If Not IsArrayAllNumeric(xArr) Then GoTo errHandler
         If Not IsArrayAllNumeric(yArr) Then GoTo errHandler
+        
+        Dim xWithoutNAs() As Double
         If Not ExtractVector(xArr, xWithoutNAs) Then GoTo errHandler
+        Dim yWithoutNAs() As Double
         If Not ExtractVector(yArr, yWithoutNAs) Then GoTo errHandler
     Else
         'else copy 'xArr' to 'xAsVector' and 'yArr' to 'yAsVector'
+        Dim xAsVector() As Variant
         If Not ExtractVector(xArr, xAsVector) Then GoTo errHandler
+        Dim yAsVector() As Variant
         If Not ExtractVector(yArr, yAsVector) Then GoTo errHandler
         
         If Not CopyOnlyNonNALines( _
@@ -323,16 +306,19 @@ Private Function MasterPolynomReg( _
     '--------------------------------------------------------------------------
     
     'transfer (new) number of 'x' elements to 'NoOfNonNADataPoints'
+    Dim NoOfNonNADataPoints As Long
     NoOfNonNADataPoints = UBound(xWithoutNAs) - LBound(xWithoutNAs) + 1
     'check again, if number of (real) data points is smaller than the given
     'polynomial degree
     If NoOfNonNADataPoints <= PolynomialDegree Then GoTo errHandler
     
+    Dim CoefficientMatrix() As Double
     CoefficientMatrix = Calculate_CoefficientMatrix( _
             xWithoutNAs, yWithoutNAs, _
             PolynomialDegree, _
             UseRelativeVersion _
     )
+    Dim VectorOfConstants() As Double
     VectorOfConstants = Calculate_VectorOfConstants( _
             xWithoutNAs, yWithoutNAs, _
             PolynomialDegree _
@@ -341,8 +327,14 @@ Private Function MasterPolynomReg( _
     'invert coefficient matrix 'CoefficientMatrix'
     '(MINVERSE can't write back to 'CoefficientMatrix')
     '(please note that the resulting array starts with index 1)
+    '(it has to be a variant to be able to use 'WorksheetFunction.MInverse')
+    Dim InverseCoefficientMatrix As Variant
     InverseCoefficientMatrix = Application.WorksheetFunction.MInverse(CoefficientMatrix)
     
+    'dynamic array for the polynomial coefficients a0,...,an
+    '(it has to be of type Variant' because of the special handler for
+    ' 'PolynomialDegree = 0')
+    Dim a() As Variant
     a = Calculate_PolynomialCoefficients( _
             InverseCoefficientMatrix, _
             VectorOfConstants, _
@@ -377,20 +369,19 @@ Private Function Calculate_CoefficientMatrix( _
     ByVal UseRelativeVersion As Boolean _
         ) As Double()
     
-    Dim i As Long
-    Dim j As Long
     Dim SumOfPowersXK() As Double
-    Dim CoefficientMatrix() As Double
-    
-    
     SumOfPowersXK = Calculate_SumOfPowersXK( _
             x, y, _
             PolynomialDegree, _
             UseRelativeVersion _
     )
     
+    Dim CoefficientMatrix() As Double
     ReDim CoefficientMatrix(0 To PolynomialDegree, 0 To PolynomialDegree)
+    
+    Dim i As Long
     For i = LBound(CoefficientMatrix, 1) To UBound(CoefficientMatrix, 1)
+        Dim j As Long
         For j = LBound(CoefficientMatrix, 2) To i
             CoefficientMatrix(i, j) = SumOfPowersXK(i + j)
             CoefficientMatrix(j, i) = SumOfPowersXK(i + j)
@@ -410,15 +401,14 @@ Private Function Calculate_SumOfPowersXK( _
     ByVal UseRelativeVersion As Boolean _
         ) As Double()
     
-    Dim i As Long
-    Dim k As Long
     Dim SumOfPowersXK() As Double
-    
-    
     ReDim SumOfPowersXK(0 To 2 * PolynomialDegree)
+    
     If UseRelativeVersion = True Then
+        Dim i As Long
         For i = LBound(SumOfPowersXK) To UBound(SumOfPowersXK)
             SumOfPowersXK(i) = 0
+            Dim k As Long
             For k = LBound(x) To UBound(x)
                 SumOfPowersXK(i) = SumOfPowersXK(i) + x(k) ^ i / y(k) ^ 2
             Next
@@ -443,16 +433,15 @@ Private Function Calculate_VectorOfConstants( _
     ByVal PolynomialDegree As Long _
         ) As Double()
     
-    Dim i As Long
-    Dim k As Long
     'dynamic array for the sum of powers for 'xk*yk'
     Dim SumOfPowersXKYK() As Double
-    
+    ReDim SumOfPowersXKYK(0 To PolynomialDegree)
     
     'calculate sum of powers 'xk*yk' and store it in a corresponding array
-    ReDim SumOfPowersXKYK(0 To PolynomialDegree)
+    Dim i As Long
     For i = LBound(SumOfPowersXKYK) To UBound(SumOfPowersXKYK)
         SumOfPowersXKYK(i) = 0
+        Dim k As Long
         For k = LBound(x) To UBound(x)
             SumOfPowersXKYK(i) = SumOfPowersXKYK(i) + x(k) ^ i * y(k)
         Next
@@ -471,12 +460,8 @@ Private Function Calculate_PolynomialCoefficients( _
     ByVal PolynomialDegree As Long _
         ) As Variant
     
-    Dim i As Long
-    Dim j As Long
-    Dim a() As Variant
-    
-    
     'polynomial coefficients a0,...,an (a(0) = a0)
+    Dim a() As Variant
     ReDim a(0 To PolynomialDegree)
     
     'matrix multiplication 'a = G_inverse * VectorOfConstants'
@@ -493,8 +478,10 @@ Private Function Calculate_PolynomialCoefficients( _
     If PolynomialDegree = 0 Then
         a(0) = InverseCoefficientMatrix(1) * VectorOfConstants(0)
     Else
+        Dim i As Long
         For i = LBound(a) To UBound(a)
             a(i) = 0
+            Dim j As Long
             For j = LBound(a) To UBound(a)
                 a(i) = a(i) + InverseCoefficientMatrix(i + 1, j + 1) * VectorOfConstants(j)
             Next
@@ -524,9 +511,6 @@ Private Function ExtractVector( _
     ByRef DestVector As Variant _
         ) As Boolean
     
-    Dim N As Long
-    
-    
     Select Case NumberOfArrayDimensions(Source)
         Case 2
             If UBound(Source, 1) > 1 And UBound(Source, 2) = 1 Then
@@ -538,6 +522,7 @@ Private Function ExtractVector( _
             End If
         Case 1
             If Not CopyArray(Source, DestVector, False) Then Exit Function
+            Dim N As Long
             N = UBound(DestVector) - LBound(DestVector) + 1
             If Not ChangeBoundsOfVector(DestVector, 1, N) Then Exit Function
         Case 0
@@ -559,18 +544,16 @@ Private Function CopyOnlyNonNALines( _
     ByVal PolynomialDegree As Long _
         ) As Boolean
     
-    Dim i As Long
-    Dim j As Long
-    
-    
     'instantiate 'xDest' and 'yDest'
     ReDim xDest(1 To UBound(xSource) - LBound(xSource) + 1)
     ReDim yDest(1 To UBound(xSource) - LBound(xSource) + 1)
     
     'cycle through each entry
+    Dim i As Long
     For i = LBound(xSource) To UBound(xSource)
         'if both values are of numeric type then transfer them to 'xDest' and 'yDest'
         If IsNumeric(xSource(i)) And IsNumeric(ySource(i)) Then
+            Dim j As Long
             j = j + 1
             xDest(j) = xSource(i)
             yDest(j) = ySource(i)
@@ -602,8 +585,6 @@ End Function
 Private Function RemoveNALines(ByRef Arr As Variant) As Boolean
     
     Dim i As Long
-    
-    
     For i = UBound(Arr) To LBound(Arr) Step -1
         'if the actual coefficient is not a number ...
         If Not IsNumeric(Arr(i)) Then
