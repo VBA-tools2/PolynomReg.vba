@@ -6,7 +6,19 @@ Option Private Module
 '@TestModule
 '@Folder("PolynomReg.Tests")
 
-Private Assert As New Rubberduck.AssertClass
+'change value from 'LateBindTests' to '1' for late bound tests
+'alternatively add
+'    LateBindTests = 1
+'to Tools > <project name> Properties > General > Conditional Compilation Arguments
+'to make it work for *all* test modules in the project
+#Const LateBind = LateBindTests
+
+#If LateBind Then
+    Private Assert As Object
+#Else
+    Private Assert As Rubberduck.PermissiveAssertClass
+#End If
+
 Private vXData As Variant
 Private vYData As Variant
 Private vCoeffs As Variant
@@ -17,6 +29,11 @@ Private i As Long
 '@ModuleInitialize
 Public Sub ModuleInitialize()
     'this method runs once per module.
+#If LateBind Then
+    Set Assert = CreateObject("Rubberduck.PermissiveAssertClass")
+#Else
+    Set Assert = New Rubberduck.PermissiveAssertClass
+#End If
 End Sub
 
 '@ModuleCleanup
