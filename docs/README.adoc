@@ -1,0 +1,228 @@
+
+= PolynomReg.vba
+:experimental:
+// :stem: latexmath
+:icons:         // not sure if this is needed
+:intellisensedir: ../IntelliSense
+:sourcedir: ../src
+:testdir: ../tests
+:uri-commit-messages: https://www.conventionalcommits.org
+:uri-ExcelDNA-IntelliSense: https://github.com/Excel-DNA/IntelliSense/
+:uri-ExcelDNA-IntelliSense-Wiki-UsageInstructions: https://github.com/Excel-DNA/IntelliSense/wiki/Usage-Instructions
+:uri-GitHub-FirstContribution: https://github.com/firstcontributions/first-contributions
+:uri-JKP-RegisterUDFs: https://jkp-ads.com/Articles/RegisterUDF01.asp
+:uri-Krucker-PolynomReg: http://www.krucker.ch/skripten-uebungen/IAMSkript/IAMKap3.pdf#page=14
+:uri-license: https://choosealicense.com/licenses/mit/
+:uri-modArraySupport2: https://github.com/VBA-tools2/modArraySupport2.vba
+:uri-rubberduck: https://rubberduckvba.com/
+:uri-UnitTests: https://en.wikipedia.org/wiki/Unit_testing
+:uri-wiki-polynomial-PolynomialFunctions: https://en.wikipedia.org/wiki/Polynomial#Polynomial_functions
+// show the corresponding icons on GitHub, because otherwise "just" the text will be shown
+ifdef::env-github[]
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :information_source:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+
+Excel Polynomial Regression functions.
+
+The original code is as old as from 1995 and was written by Gerhard Krucker (see {uri-Krucker-PolynomReg}).
+So all credits go to him!
+
+Luckily he allowed to reuse his code and here it is with a big refactor and some extensions.
+
+== Features
+
+Before I present a list of features, I give a definition of a _polynomial function_, which then allows to list the features more easily.
+A _polynomial function_ (with a single variable/indeterminante) can be written as
+
+```math
+y = \sum_{i=0}^{n} a_{i} x^i
+```
+
+where $y$ is the result of the polynomial function, $x$ is the variable/indeterminante, $a_i$ are the polynomial coefficients, and $n$ is the polynomial degree.footnote:[
+   If you want to know more about this, please have a look at e.g. the {uri-wiki-polynomial-PolynomialFunctions}["`Polynomial Functions`" Wikipedia article].
+]
+
+Knowing that, this code allows
+
+* to calculate polynomial coefficients $a_i$ for a set of $x$ and $y$ values as well as a given polynomial degree $n$ and
+* to calculate the result $y$ for a given set of polynomial coefficients $a_i$ and a variable/indeterminante $x$.
+* `#NA` input values are allowed to easier remove some outliers for the calculation of the polynomial coefficients and to prevent the need to resize the list of the polynomial coefficients when the polynomial degree is changing.
+
+Additionally you will find
+
+* code to register the functions to the "`Function Wizard`" and
+* an XML file to allow showing function information as IntelliSense.
+
+== Prerequisites / Dependencies
+
+Since this is an Excel VBA module you obviously need Microsoft Excel.
+
+In addition you need (the sources of)
+
+* {uri-modArraySupport2}.
+
+If you want to have IntelliSense for the functions, you also need the (activated)
+
+* {uri-ExcelDNA-IntelliSense}[Excel-DNA IntelliSense] AddIn.
+
+[#how-to-install]
+== How to install / Getting started
+
+[#install-functions]
+=== Install the Functions
+
+Add the file(s) from
+
+* the link:{sourcedir}[src] folder and
+* the link:{uri-modArraySupport2}/src[modArraySupport2 src] folder
+
+to your project.
+Yes, it's that simple.
+
+._If you need some more advice on how to do that, expand me._
+[%collapsible]
+====
+. Open Microsoft Excel.
+. Open the Visual Basic Editor (VBE) (kbd:[Alt+F11]).
+. Add the file(s) in the link:{sourcedir}[src] folder to your VBA project.
+** With {uri-rubberduck}[Rubberduck]:
+.. Right-click on the project to which you want to add the file(s) in the "`Code Explorer`" (to show it press kbd:[Ctrl+R]) and click on menu:Add[Existing Files...].
+.. Select all files in the link:{sourcedir}[src] folder and click on btn:[Open].
+** Without Rubberduck:
+.. Select all files in the link:{sourcedir}[src] folder in Windows File Explorer.
+.. Drag-and-drop them to the corresponding project in VBE's "`Project Explorer`". +
+   (To show it press kbd:[Ctrl+R].
+   Hit it twice if the Code Explorer shows up first.)
+. Add the file(s) from the link:{uri-modArraySupport2}/src[modArraySupport2 src folder] as well to the project.
+// BUG: "project name" can't be put in normal angle brackets, because the closing bracket would be interpreted as menu delimiter. I couldn't find a way how to "escape" that (i.e. a backslash didn't work). Thus, single guillemets are used.
+. Check, if there are obvious errors by compiling the project (menu:Debug[Compile ‹project name›]).
+. Save the file/project.
+.. Be sure that the file/project you want to save is "`active`" in the VBE by checking, if its name is shown in VBE's title bar. +
+   (If it's not, open a (class) module of the corresponding project (and close it again).)
+.. Press the "`Save`" button (the disc symbol similar to 💾) in VBE's toolbar.
+.. Check that the file (really) was saved by having a look at the "`last modified date`" of the (project) file in the Windows File Explorer.
+====
+
+=== Register the Functions
+
+Additionally you can run the `+AddUDFToCustomCategory+` procedure to register the functions (to the "`Function Wizard`").
+To do so, place the cursor somewhere inside that procedure and hit kbd:[F5].footnote:[
+   If you don't know what this is all about, you could bring some light into the dark by e.g. reading Jan Karel Pieterse's {uri-JKP-RegisterUDFs}[Registering a User Defined Function with Excel] article.
+]
+
+=== Add IntelliSense to Functions
+
+If you also want to have IntelliSense for the functions, the needed XML file(s) can be found in the link:{intellisensedir}[IntelliSense] folder.
+
+._If you need some more advice on how to do that, expand me._
+[%collapsible]
+====
+Have a look at the awesome {uri-ExcelDNA-IntelliSense}[Excel-DNA IntelliSense] project.
+Especially at
+
+* the projects link:{uri-ExcelDNA-IntelliSense}blob/master/README.md["`README`" file],
+* the Wiki entry link:{uri-ExcelDNA-IntelliSense-Wiki-UsageInstructions}#custom-xml-part-in-an-open-workbook["`Custom XML part in an open Workbook`"], and
+* the Wiki entry link:{uri-ExcelDNA-IntelliSense-Wiki-UsageInstructions}#external-intellisensexml-file["`External .intellisense.xml file`"].
+====
+
+[#usage]
+== Usage / Show it in action
+
+Because usual (user defined) functions are provided by this code, it should be clear how to use them.
+If you want to see them in action anyway, please have a look at the XLSX file in the link:{sourcedir}[src] folder.
+
+== Running Tests
+
+Yes, {uri-UnitTests}[Unit Tests] in Excel _are_ possible.
+For that you need to have the awesome {uri-rubberduck}[Rubberduck] AddIn installed (and enabled).
+
+The procedure is very similar to the one given in the <<install-functions>> section, but this time add the files from the link:{testdir}[tests] folder (instead of the files from the link:{sourcedir}[src] folder).
+When you are done with that, additionally perform the following steps.
+
+. Check that the files from the link:{sourcedir}[src] folder are present in the project as well or that you have a reference to project with the source files.footnote:[
+   See the collapsible in the next point on how to do that.
+   If you use the Rubberduck way, before adding the reference you first need to switch to the menu:Projects[] tab.
+] +
+  (Otherwise tests will/should fail.)
+. Add a reference to the "`Rubberduck AddIn`" to the project (with the test modules).
++
+._If you don't have a clue how to do that, expand me._
+[%collapsible]
+====
+* With {uri-rubberduck}[Rubberduck]:
+. Right-click somewhere on the project in the "`Code Explorer`" and click on menu:Add/Remove{sp}References...[].
+. Add the reference.
+.. Type (parts of) the library name in the search box until you see it in below (left) list or it is empty.
+** If the AddIn file name is in the lower left list box:
+... Select the library in the (left) list and
+... click on the btn:[➨] button to add it to the project references. +
+** If the the AddIn file name is _not_ in the list:
+... Click on the btn:[Browse...] button.
+... Browse to the folder where the AddIn is located.
+... Select the AddIn and
+... press the btn:[Open] button.
+. Click on the btn:[OK] button to close the window.
+* Without Rubberduck:
+. Open the Reference manager in the VBE (menu:Tools[References...]).
+** If the AddIn project name is in the list of available references:
+.. Add a checkmark to the corresponding library.
+** If it's _not_ in the list:
+.. Click on the btn:[Browse...] button.
+.. Browse to the folder where the AddIn is located.
+.. Select the AddIn and
+.. press the btn:[Open] button.
+. Click on the btn:[OK] button to close the window.
+. Save the file/project.
+====
++
+. Open the "`Test Explorer`" (menu:Rubberduck[Unit Tests > Test Explorer]).
+. Run the tests by clicking menu:Run[All Tests].
+
+== Used By
+
+This project is used by (at least) these projects:
+
+* http://www.unitoperations.de[]
+
+If you know more, I'll be happy to add them here.
+In addition it is used by a lot of private, i.e. non-public, Excel AddIns created by the author.
+
+== Known issues and limitations
+
+None that I am aware of.
+
+[#contributing]
+== Contributing
+
+All contributions are highly welcome!!
+
+If you are new to git/GitHub, please have a look at {uri-GitHub-FirstContribution} where you will find a lot of useful information for beginners.
+
+I recently was pointed to {uri-commit-messages} which sounds very promising.
+I will use them from now on too (and hopefully don't forget it in a hurry).
+
+== FAQ
+
+[qanda]
+What are the `+'@...+` comments good for in the code?::
+You should really have a look at the awesome {uri-rubberduck}[Rubberduck] project!
+
+== Similar Projects
+
+I am aware of
+
+* https://www.real-statistics.com/multiple-regression/polynomial-regression/polynomial-regression-analysis-tool/[https://www.real-statistics.com/]
+* https://rosettacode.org/wiki/Polynomial_regression#VBA[]
+
+The first one seems very impressive.
+You should check it out too.
+
+If _you_ know more similar projects, please let me know.
+
+== License
+
+{uri-license}[MIT]
