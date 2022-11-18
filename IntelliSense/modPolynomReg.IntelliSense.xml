@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?xml-model href="IntelliSense.xsd"?>
+<IntelliSense xmlns="http://schemas.excel-dna.net/intellisense/1.0">
+	<FunctionInfo>
+		<Function
+			Name="Polynom"
+			Description="Calculates polynomial expression f(x) = a0 + a1*x + a2*x^2 + ... + an*x^n"
+			Category="3"
+		>
+			<Argument
+				Name="Coefficients"
+				Description="Coefficients (a0, a1, a2, ...)"
+			/>
+			<Argument
+				Name="x"
+				Description="Independent variable (x)"
+			/>
+			<Argument
+				Name="[IgnoreNA]"
+				Description="(Optional) TRUE = interpret #NA's as 0's"
+			/>
+		</Function>
+
+		<Function
+			Name="PolynomReg"
+			Description="Calculates polynomial coefficients (a0,...,an)"
+			Category="3"
+		>
+			<Argument
+				Name="x"
+				Description="Array of 'x' values"
+			/>
+			<Argument
+				Name="y"
+				Description="Array of 'y' values"
+			/>
+			<Argument
+				Name="PolynomialDegree"
+				Description="Polynomial degree"
+			/>
+			<Argument
+				Name="[VerticalOutput]"
+				Description="(Optional) TRUE = return coefficients vertically"
+			/>
+			<Argument
+				Name="[IgnoreNAs]"
+				Description="(Optional) TRUE = ignore #NA entries"
+			/>
+		</Function>
+
+		<Function
+			Name="PolynomRegRel"
+			Description="Calculates polynomial coefficients (a0,...,an)"
+			Category="3"
+		>
+			<Argument
+				Name="x"
+				Description="Array of 'x' values"
+			/>
+			<Argument
+				Name="y"
+				Description="Array of 'y' values"
+			/>
+			<Argument
+				Name="PolynomialDegree"
+				Description="Polynomial degree"
+			/>
+			<Argument
+				Name="[VerticalOutput]"
+				Description="(Optional) TRUE = return coefficients vertically"
+			/>
+			<Argument
+				Name="[IgnoreNAs]"
+				Description="(Optional) TRUE = ignore #NA entries"
+			/>
+		</Function>
+	</FunctionInfo>
+</IntelliSense>
