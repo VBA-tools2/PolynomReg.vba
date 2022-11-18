@@ -1,0 +1,26 @@
+// cSpell Settings
+{
+    // ignoreWords - list of words that should be ignored
+    "ignoreWords": [
+        "ifdef",
+        "intellisensedir",
+        "intellisensexml",
+        "latexmath",
+        "MINVERSE",
+        "qanda",
+        "rubberduck",
+        "sourcedir",
+        "testdir",
+        "Trigonom",
+        "UDF",
+        "XKYK"
+    ],
+    // words - list of words to be always considered correct
+    "words": [
+        "indeterminante",
+        "guillemets",
+        "Karel",
+        "Krucker",
+        "Pieterse"
+    ]
+}
