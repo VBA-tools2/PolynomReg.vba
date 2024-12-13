@@ -103,16 +103,11 @@ Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 +
     End If
     If Not IsArrayAllNumeric(arrCoeffs) Then GoTo errHandler
     
-'---
-'TODO:
-'- check, if the coefficients are a scalar or a vector
-'  if it is a scalar use the simple form
-'  --> maybe this has to be tested earlier as well in 'ExtractVector'?
-'---
+    'apply Horner scheme
     Dim i As Long
-    For i = LBound(arrCoeffs) To UBound(arrCoeffs)
+    For i = UBound(arrCoeffs) To LBound(arrCoeffs) Step -1
         Dim sum As Double
-        sum = sum + arrCoeffs(i) * x ^ (i - LBound(arrCoeffs))
+        sum = arrCoeffs(i) + sum * x
     Next
     
     'return the result
