@@ -7,7 +7,11 @@ Option Base 1
 
 '<https://codereview.stackexchange.com/a/161784>
 Public Function RangeToArray(ByVal target As Range) As Variant
-    If target.Rows.Count = 1 Then
+    If target.Rows.Count = 1 And target.Columns.Count = 1 Then
+        Dim arr(1 To 1) As Variant
+        arr(1) = target
+        RangeToArray = arr
+    ElseIf target.Rows.Count = 1 Then
         'horizontal 1D range
         RangeToArray = Application.WorksheetFunction.Transpose( _
                 Application.WorksheetFunction.Transpose(target.Value) _

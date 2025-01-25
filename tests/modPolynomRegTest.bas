@@ -408,3 +408,27 @@ TestExit:
 TestFail:
     Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
 End Sub
+
+'@TestMethod("Polynom")
+Public Sub Polynom_MultipleXValues_ReturnsVector()
+    On Error GoTo TestFail
+    
+    'Arrange:
+    vCoeffs = -5#
+    vXData = Array(1, 2)
+    aExpected = vCoeffs
+    
+    'Act:
+    aActual = modPolynomReg.Polynom(vCoeffs, vXData)
+    
+    'Assert:
+    Dim i As Long
+    For i = LBound(vXData) To UBound(vXData)
+        Assert.AreEqual aExpected, aActual(i)
+    Next
+    
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test raised an error: #" & Err.Number & " - " & Err.Description
+End Sub

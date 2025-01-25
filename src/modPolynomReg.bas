@@ -75,7 +75,7 @@ End Sub
 '@Description("Calculates polynomial expression f(x) = a0 + a1*x + a2*x^2 + ... + an*x^n")
 Public Function Polynom( _
     ByVal Coefficients As Variant, _
-    ByVal x As Double, _
+    ByVal x As Variant, _
     Optional ByVal IgnoreNA As Variant _
         ) As Variant
 Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 + a1*x + a2*x^2 + ... + an*x^n"
@@ -96,6 +96,9 @@ Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 +
     Dim arrCoeffs() As Variant
     If Not ExtractVector(Coefficients, arrCoeffs) Then GoTo errHandler
     
+    Dim xArr As Variant
+    xArr = ConvertToArray(x)
+    
     'if 'IgnoreNA' is 'TRUE' then remove all trailing 'NAs' lines
     '(this only makes sense if more than one coefficient is given)
     If IgnoreNA = True Then
@@ -103,15 +106,31 @@ Attribute Polynom.VB_Description = "Calculates polynomial expression f(x) = a0 +
     End If
     If Not IsArrayAllNumeric(arrCoeffs) Then GoTo errHandler
     
-    'apply Horner scheme
-    Dim i As Long
-    For i = UBound(arrCoeffs) To LBound(arrCoeffs) Step -1
-        Dim sum As Double
-        sum = arrCoeffs(i) + sum * x
+    Dim sum() As Double
+    ReDim sum(LBound(xArr) To UBound(xArr))
+    
+    Dim j As Long
+    For j = LBound(xArr) To UBound(xArr)
+        'apply Horner scheme
+        Dim i As Long
+        For i = UBound(arrCoeffs) To LBound(arrCoeffs) Step -1
+            sum(j) = arrCoeffs(i) + sum(j) * xArr(j)
+        Next
     Next
     
-    'return the result
-    Polynom = sum
+    If TypeName(x) = "Range" Then
+        If x.Columns.Count = 1 Then
+            Polynom = Application.WorksheetFunction.Transpose(sum)
+        Else
+            Polynom = sum
+        End If
+    'to avoid a type mismatch error in case only a single return value is
+    'allowed like for 'Debug.Print'
+    ElseIf Not IsArray(x) Then
+        Polynom = sum(1)
+    Else
+        Polynom = sum
+    End If
     Exit Function
     
     
@@ -498,6 +517,28 @@ Private Sub HandleSpecialCaseForPolynomialDegreeEqualsZero( _
     a(1) = CVErr(xlErrNA)
     
 End Sub
+
+
+'==============================================================================
+'convert 'target' to an array
+Private Function ConvertToArray(target As Variant) As Variant
+    
+    If Not IsArray(target) Then
+        Dim Scalar(1 To 1) As Variant
+        Scalar(1) = target
+        
+        Dim Arr As Variant
+        Arr = Scalar
+    ElseIf TypeName(target) = "Range" Then
+        Arr = RangeToArray(target)
+    Else
+        Arr = target
+    End If
+    
+    ConvertToArray = Arr
+    
+End Function
+
 
 'function to make vectors of the ranges/arrays and optionally only transfer
 'non-NA values
